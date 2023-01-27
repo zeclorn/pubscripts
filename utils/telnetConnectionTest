@@ -1,0 +1,21 @@
+while read p; do
+        if [ ! -z "$p" -a "$p" != " " ]; then
+            FLOWDESC=`echo $p | cut -d',' -f1`
+            ENV=`echo $p | cut -d',' -f2`
+            SOURCEIP=`echo $p | cut -d',' -f3`
+            DESTIP=`echo $p | cut -d',' -f4`
+            PORT=`echo $p | cut -d',' -f5`
+            PROTO=`echo $p | cut -d',' -f6`
+		
+    (  sleep 2;
+       TELNET_STR=`telnet "$DESTIP" "$PORT" | grep "Connected"`
+            if [ ! -z "$TELNET_STR" -a "$TELNET_STR" != " " ]; then
+                echo '[success]:'$DESTIP':'$PORT 
+				echo $FLOWDESC','$ENV','$SOURCEIP','$DESTIP','$PORT','$PROTO',SUCCESS' >> output.csv
+            else
+                echo '[failed]:'$DESTIP':'$PORT
+				echo $FLOWDESC','$ENV','$SOURCEIP','$DESTIP','$PORT','$PROTO',FAILED' >> output.csv				
+            fi
+ ) &
+        fi
+    done <ips.csv
